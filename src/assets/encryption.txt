@@ -1,0 +1,105 @@
+import galois
+import numpy as np
+from math import floor, log2
+
+GF = galois.GF(256)
+diffusion_matrix = GF(DIFFUSION_MATRIX)
+
+block_size = BLOCK_SIZE 
+
+inverse_diffusion_matrix = np.linalg.inv(diffusion_matrix)
+
+s_box = S_BOX
+
+inverse_s_box = [None] * 256
+
+for (i, x) in enumerate(s_box):
+    inverse_s_box[x] = i
+
+
+def substitute(data):
+    return GF(list(map(lambda x: s_box[x], data)))
+
+def inverse_substitute(data):
+    return GF(list(map(lambda x: inverse_s_box[x], data)))
+
+def diffuse_doubled(data, number_of_doubles):
+    if number_of_doubles == 0:
+        return np.matmul(diffusion_matrix, data)
+
+    left_half_diffused = diffuse_doubled(
+        data[:len(data)//2], number_of_doubles-1)
+
+    right_half_diffused = diffuse_doubled(
+        data[len(data)//2:], number_of_doubles-1)
+    new_data = np.append(left_half_diffused, right_half_diffused)
+    inner_quarters = diffuse_doubled(
+        new_data[len(data)//4:len(data) - len(data)//4], number_of_doubles-1)
+    outer_quarters = diffuse_doubled(np.append(new_data[:len(
+        data)//4], new_data[len(data) - len(data)//4:]), number_of_doubles-1)
+
+    return np.append(np.append(outer_quarters[:len(outer_quarters) // 2], inner_quarters), outer_quarters[len(outer_quarters)//2:])
+
+
+def inverse_diffuse_doubled(data, number_of_doubles):
+    if number_of_doubles == 0:
+        return np.matmul(inverse_diffusion_matrix, data)
+    inner_quarters = inverse_diffuse_doubled(
+        data[len(data)//4:len(data) - len(data)//4], number_of_doubles-1)
+    outer_quarters = inverse_diffuse_doubled(np.append(data[:len(
+        data)//4], data[len(data) - len(data)//4:]), number_of_doubles-1)
+
+    new_data = np.append(np.append(outer_quarters[:len(
+        outer_quarters) // 2], inner_quarters), outer_quarters[len(outer_quarters)//2:])
+
+    left_half_diffused = inverse_diffuse_doubled(
+        new_data[:len(data)//2], number_of_doubles-1)
+
+    right_half_diffused = inverse_diffuse_doubled(
+        new_data[len(data)//2:], number_of_doubles-1)
+    return np.append(left_half_diffused, right_half_diffused)
+
+
+def inverse_diffuse_in_parallel_doubled(data, number_of_doubles):
+    result = GF([])
+    step = len(inverse_diffusion_matrix)*2**number_of_doubles
+    for i in range(0, len(data), step):
+        result = np.append(result, GF(inverse_diffuse_doubled(
+            data[i:i+step], number_of_doubles)))
+    return result
+
+def diffuse_in_parallel_doubled(data, number_of_doubles):
+    result = GF([])
+    step = len(diffusion_matrix)*2**number_of_doubles
+    for i in range(0, len(data), step):
+        result = np.append(result, GF(diffuse_doubled(
+            data[i:i+step], number_of_doubles)))
+    return result
+
+
+def eta(data, k):
+    if k == 0:
+        return substitute(diffuse_in_parallel_doubled(
+            substitute(data), 0))
+
+    tmp = eta(data, k-1)
+    tmp_diffused = diffuse_in_parallel_doubled(
+        tmp, k)
+    return eta(tmp_diffused, k-1)
+
+def inverse_eta(data, k):
+    if k == 0:
+        return inverse_substitute(inverse_diffuse_in_parallel_doubled(
+            inverse_substitute(data), 0))
+
+    tmp = inverse_eta(data, k-1)
+    tmp_diffused = inverse_diffuse_in_parallel_doubled(
+        tmp, k)
+    return inverse_eta(tmp_diffused, k-1)
+
+
+def encrypt(block, key):
+    return eta(GF(block) + GF(key), floor(log2(block_size/len(diffusion_matrix)))) 
+
+def decrypt(block, key):
+    return inverse_eta(GF(block), floor(log2(block_size/len(diffusion_matrix)))) + GF(key)
