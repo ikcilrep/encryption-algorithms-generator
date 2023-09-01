@@ -5,12 +5,12 @@
         <v-icon size="200" color="green darken-2" icon="mdi-check"></v-icon>
       </v-row>
       <v-row align="center" justify="center" class="fill-height">
-        Ukończono generację programu!
+        Code generation completed!
       </v-row>
       <v-container class="pt-15" fluid>
         <v-row align="center" justify="center" class="fill-height">
           <v-btn color="primary" @click="saveFile">
-            Pobierz kod
+            Download the code
             <v-icon icon="mdi-download"></v-icon>
           </v-btn>
         </v-row>

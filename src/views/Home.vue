@@ -5,7 +5,7 @@
         <v-form ref="form" v-model="valid" lazy-validation>
           <v-row>
             <v-col cols="11">
-              <v-slider v-model="diffusionLayerSize" thumb-label="always" label="Liczba bitów siatki dyfuzji" max="1024"
+              <v-slider v-model="diffusionLayerSize" thumb-label="always" label="Diffusion layer size (bits)" max="1024"
                 min="16" step="8"></v-slider>
             </v-col>
             <v-col>
@@ -13,15 +13,15 @@
                 <template v-slot:activator="{ props }">
                   <v-icon icon="mdi-help-circle" v-bind="props"></v-icon>
                 </template>
-                <p>Wymiar kwadratowej macierzy przekształcenia liniowego.</p>
-                <p>Im większa jest to liczba, tym mniejsza wydajność,</p>
-                <p>ale większy rozmiar bloku.</p>
+                <p>Dimension of the linear transformation's square matrix.</p>
+                <p>The bigger the number, the less efficient the cipher is,</p>
+                <p>but the block size is bigger.</p>
               </v-tooltip>
             </v-col>
           </v-row>
           <v-row>
             <v-col cols="11">
-              <v-slider v-model="numberOfDoubles" thumb-label="always" label="Liczba podwojeń" max="10" min="0"
+              <v-slider v-model="numberOfDoubles" thumb-label="always" label="The number of doublings" max="10" min="0"
                 v-bind="props" step="1"></v-slider>
             </v-col>
             <v-col>
@@ -30,42 +30,39 @@
                   <v-icon icon="mdi-help-circle" v-bind="props"></v-icon>
                 </template>
                 <p>
-                  Liczba podwojeń wielkości siatki dyfuzji czyli równoznacznie
-                </p>
-                <p>
-                  wielkości bloku.
+                  The number of times the diffusion layer and the block is doubled.
                 </p>
               </v-tooltip>
             </v-col>
           </v-row>
 
           <v-select v-model="linearTransformationType" :items="linearTransformations"
-            :rules="[v => !!v || 'To pole jest wymagane']" label="Macierz dyfuzji" required>
+            :rules="[v => !!v || 'To pole jest wymagane']" label="Diffusion matrix" required>
           </v-select>
 
           <v-select v-model="nonLinearTransformationType" :items="nonLinearTransformations"
-            :rules="[v => !!v || 'To pole jest wymagane']" label="Nieliniowe przekształcenie" required>
+            :rules="[v => !!v || 'To pole jest wymagane']" label="Non-linear transformation" required>
           </v-select>
           <v-text-field v-model="affineCoefficient" :rules="coefficientRules" :counter="10"
-            label="Współczynnik przekształcenia afinicznego" required></v-text-field>
+            label="The affine transformation coefficient" required></v-text-field>
           <v-text-field v-model="affineConstant" :rules="constantRules" :counter="11"
-            label="Stała przekształcenia afinicznego" required></v-text-field>
+            label="The affine transformation constant" required></v-text-field>
           <v-progress-linear v-model="fullProgress" color="primary" class="text-white" height="30">
-            Blok {{ numberOfBitsText(Math.pow(2, this.numberOfDoubles) * this.diffusionLayerSize) }}
+            {{ numberOfBitsText(Math.pow(2, this.numberOfDoubles) * this.diffusionLayerSize) }} block
           </v-progress-linear>
           <br />
-          <v-tooltip text="Minimalna liczba rund, która jest konieczna w procesie szyfrowania." location="bottom">
+          <v-tooltip text="Minimal number of rounds required." location="bottom">
             <template v-slot:activator="{ props }">
               <v-progress-linear v-model="fullProgress" color="secondary" class="text-black" height="30" v-bind="props">
-                {{ numberOfRounds() }} runda
+                {{ numberOfRounds() }} round 
               </v-progress-linear>
             </template>
           </v-tooltip>
           <v-container class="pa-12" fluid>
-            <v-tooltip text="Kliknij aby wygenerować kod szyfrujący w Pythonie">
+            <v-tooltip text="Click to generate code in Python">
               <template v-slot:activator="{ props }">
                 <v-btn :disabled="!valid" color="success" @click="validate" v-bind="props">
-                  Wygeneruj
+                  Generate 
                 </v-btn>
               </template>
             </v-tooltip>
@@ -83,13 +80,13 @@ export default {
     fullProgress: 100,
     valid: false,
     nonLinearTransformations: [
-      'Inwersja',
-      'Potęga trzecia'
+      'Inversion',
+      'Cube'
     ],
     linearTransformations: [
-      'Cykliczna',
-      'Vandermond\'a',
-      'Cauchy\'iego'
+      'Cyclic',
+      'Vandermond\'s',
+      'Cauchy\'s'
     ],
     nonLinearTransformationType: null,
     linearTransformationType: null,
@@ -101,13 +98,13 @@ export default {
     coefficientRules: [
       v => {
         const coefficient = parseInt(v);
-        return (!isNaN(coefficient) && coefficient.toString() === v && coefficient < 256 && coefficient > 0) || 'Współczynnik musi być liczbą naturalną mniejszą niż 256';
+        return (!isNaN(coefficient) && coefficient.toString() === v && coefficient < 256 && coefficient > 0) || 'The factor has to be a natural number smaller than 256';
       }
     ],
     constantRules: [
       v => {
         const constant = parseInt(v);
-        return (!isNaN(constant) && constant.toString() === v && constant < 256 && constant > 0) || 'Stała musi być liczbą naturalną mniejszą niż 256';
+        return (!isNaN(constant) && constant.toString() === v && constant < 256 && constant > 0) || 'The constant has to be a natural number smaller than 256';
       }
     ]
   }),
@@ -124,7 +121,7 @@ export default {
       return Math.ceil(Math.max(a, b));
     },
     numberOfBitsText(number) {
-      return (number > 1000 || number < 100) && number % 10 < 5 && number % 10 > 1 ? number + ' bity' : number + ' bitów'
+      return number + ' bits';
     },
     validate() {
       this.$refs.form.validate()

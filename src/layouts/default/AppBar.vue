@@ -11,7 +11,7 @@
               contain
           ></v-img>
           <v-toolbar-title to="/">
-            Generator algorytmów szyfrowania 
+            Encryption algorithms generator
           </v-toolbar-title>
         </router-link>
       </v-app-bar>

@@ -65,12 +65,12 @@ export default {
 
     generateSBox() {
       const sbox = [];
-      if (this.nonLinearTransformationType === "Inwersja") {
+      if (this.nonLinearTransformationType === "Inversion") {
         for (let i = 0; i < 256; i++) {
           const element = this.multiplyInFiniteField(this.inverseInFiniteField(i), this.affineCoefficient) ^ this.affineConstant;
           sbox.push(element);
         }
-      } else if (this.nonLinearTransformationType === "Potęga trzecia") {
+      } else if (this.nonLinearTransformationType === "Cube") {
         for (let i = 0; i < 256; i++) {
           const element = this.multiplyInFiniteField(this.cubeInFiniteField(i), this.affineCoefficient) ^ this.affineConstant;
           sbox.push(element);
@@ -80,7 +80,7 @@ export default {
     },
     generateMatrix() {
       const matrix = [];
-      if (this.linearTransformationType === "Cykliczna") {
+      if (this.linearTransformationType === "Cyclic") {
         for (let i = 0; i < this.diffusionLayerSize / 8; i++) {
           const row = [];
           for (let j = 0; j < this.diffusionLayerSize / 8; j++) {
