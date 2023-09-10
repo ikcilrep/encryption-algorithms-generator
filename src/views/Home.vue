@@ -52,7 +52,7 @@
           </v-progress-linear>
           <br />
           <v-progress-linear v-model="fullProgress" color="red" class="text-white" height="30">
-            {{ Math.round((Math.pow(this.diffusionLayerSize, 2) * 2)/8192)}} kB RAM memory required 
+            {{ (0.25 + (Math.pow(this.diffusionLayerSize, 2) * 2)/8192).toFixed(2)}} kB RAM memory required 
           </v-progress-linear>
           <br />
           <v-tooltip text="Minimal number of rounds required." location="bottom">
