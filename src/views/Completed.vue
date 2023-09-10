@@ -31,7 +31,7 @@ export default {
       const diffusionMatrix = this.generateMatrix();
       const sBox = this.generateSBox();
 
-      text = text.replace('DIFFUSION_MATRIX',  `[${diffusionMatrix.map(row => `[${row}]`)}]`);
+      text = text.replace('DIFFUSION_MATRIX', `[${diffusionMatrix.map(row => `[${row}]`)}]`);
       text = text.replace('BLOCK_SIZE', this.blockSize);
       text = text.replace('S_BOX', `[${sBox}]`);
       const blob = new Blob([text], { type: 'text/plain' })
@@ -86,6 +86,14 @@ export default {
       }
       return sbox;
     },
+
+    powerInFiniteField(a, b) {
+      let result = 1;
+      for (let i = 0; i < b; i++) {
+        result = this.multiplyInFiniteField(a, result);
+      }
+      return result;
+    },
     generateMatrix() {
       const matrix = [];
       if (this.linearTransformationType === "Cyclic") {
@@ -93,6 +101,15 @@ export default {
           const row = [];
           for (let j = 0; j < this.diffusionLayerSize / 8; j++) {
             row.push((i + j) % (this.diffusionLayerSize / 8) + 1);
+          }
+          matrix.push(row);
+        }
+        return matrix;
+      } else if (this.linearTransformationType == "Vandermonde") {
+        for (let i = 0; i < this.diffusionLayerSize / 8; i++) {
+          const row = [];
+          for (let j = 0; j < this.diffusionLayerSize / 8; j++) {
+            row.push(this.powerInFiniteField(i, j));
           }
           matrix.push(row);
         }

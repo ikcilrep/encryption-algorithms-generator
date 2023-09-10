@@ -89,8 +89,8 @@ export default {
     ],
     linearTransformations: [
       'Cyclic',
-      'Vandermond\'s',
-      'Cauchy\'s'
+      'Vandermonde',
+      'Cauchy'
     ],
     nonLinearTransformationType: null,
     linearTransformationType: null,
