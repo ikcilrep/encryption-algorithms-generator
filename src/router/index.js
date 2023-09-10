@@ -51,14 +51,16 @@ const routes = [
         // which is lazy-loaded when the route is visited.
         component: () => import(/* webpackChunkName: "home" */ '@/views/Completed.vue'),
         props: route => ({
-          diffusionMatrix: route.query.diffusionMatrix,
-          sBox: route.query.sBox,
+          nonLinearTransformationType: route.query.nonLinearTransformationType,
+          affineCoefficient: route.query.affineCoefficient,
+          affineConstant: route.query.affineConstant,
+          linearTransformationType: route.query.linearTransformationType,
+          diffusionLayerSize: route.query.diffusionLayerSize,
+          numberOfDoubles: route.query.numberOfDoubles,
           blockSize: route.query.blockSize,
         })
-
-      },
+      }
     ],
-
   },
   {
     path: '/code',

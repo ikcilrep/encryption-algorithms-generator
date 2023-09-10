@@ -51,6 +51,10 @@
             {{ numberOfBitsText(Math.pow(2, this.numberOfDoubles) * this.diffusionLayerSize) }} block
           </v-progress-linear>
           <br />
+          <v-progress-linear v-model="fullProgress" color="red" class="text-white" height="30">
+            {{ Math.round((Math.pow(this.diffusionLayerSize, 2) * 2)/8192)}} kB RAM memory required 
+          </v-progress-linear>
+          <br />
           <v-tooltip text="Minimal number of rounds required." location="bottom">
             <template v-slot:activator="{ props }">
               <v-progress-linear v-model="fullProgress" color="secondary" class="text-black" height="30" v-bind="props">
